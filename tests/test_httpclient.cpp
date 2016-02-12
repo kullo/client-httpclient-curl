@@ -29,6 +29,17 @@ protected:
     std::shared_ptr<MockResponseListener> respL;
 };
 
+#if 0
+TEST_F(HttpClientImpl, successOnBadAuth)
+{
+    EXPECT_CALL(*respL, progress(_, _, _, _))
+            .WillRepeatedly(Return(Http::ProgressResult::Continue));
+    req->url = "http://httpbin.org/basic-auth/user/passwd";
+    auto resp = uut.sendRequest(*req, 0, nullptr, respL);
+    EXPECT_THAT(resp.error, Eq(boost::none));
+    EXPECT_THAT(resp.statusCode, Eq(401));
+}
+#endif
 
 TEST_F(HttpClientImpl, connectionFailure)
 {

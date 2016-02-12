@@ -11,7 +11,10 @@
 #include <sstream>
 
 #include <boost/regex.hpp>
+#include <kulloclient/http/Request.h>
 #include <kulloclient/http/RequestListener.h>
+#include <kulloclient/http/Response.h>
+#include <kulloclient/http/ResponseError.h>
 #include <kulloclient/http/ResponseListener.h>
 #include <kulloclient/util/assert.h>
 #include <kulloclient/util/librarylogger.h>

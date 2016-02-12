@@ -9,6 +9,8 @@
 #include <curl_header.h>
 
 #include <kulloclient/http/HttpClient.h>
+#include <kulloclient/http/HttpHeader.h>
+#include <kulloclient/http/HttpMethod.h>
 #include <kulloclient/http/ProgressResult.h>
 
 namespace HttpClient {
