@@ -1,5 +1,10 @@
 CONFIG += c++11
 
+# Disable GNU extensions (default for Qt 5.5 and older)
+# See ff4444065158285b573c6fc0a91c9e75fc7ddd96
+# https://codereview.qt-project.org/#/c/121023/
+CONFIG += strict_c++
+
 CONFIG(release, debug|release): DEFINES += NDEBUG
 
 CONFIG(release, debug|release):    LIBKULLO_BIN_DIR = $$PWD/../bin-libkullo
