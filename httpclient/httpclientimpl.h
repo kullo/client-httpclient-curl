@@ -33,9 +33,8 @@ public:
     HttpClientImpl();
     virtual ~HttpClientImpl() override;
 
-    virtual Kullo::Http::Response sendRequest(
-            const Kullo::Http::Request &request,
-            int64_t timeout,
+    virtual Kullo::Http::Response sendRequest(const Kullo::Http::Request &request,
+            int32_t timeoutMs,
             const std::shared_ptr<Kullo::Http::RequestListener> &requestListener,
             const std::shared_ptr<Kullo::Http::ResponseListener> &responseListener
             ) override;

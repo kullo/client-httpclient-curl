@@ -123,13 +123,12 @@ HttpClientImpl::~HttpClientImpl()
 {
 }
 
-Http::Response HttpClientImpl::sendRequest(
-        const Http::Request &request,
-        int64_t timeout,
+Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
+        int32_t timeoutMs,
         const std::shared_ptr<Http::RequestListener> &requestListener,
         const std::shared_ptr<Http::ResponseListener> &responseListener)
 {
-    kulloAssert(timeout >= 0);
+    kulloAssert(timeoutMs >= 0);
 
     Http::Response result(
                 boost::optional<Http::ResponseError>(),
@@ -143,10 +142,10 @@ Http::Response HttpClientImpl::sendRequest(
     }
 
     // timeout
-    kulloAssert(timeout <= std::numeric_limits<long>::max());
-    if (timeout > 0)
+    kulloAssert(timeoutMs <= std::numeric_limits<long>::max());
+    if (timeoutMs > 0)
     {
-        curlEasy_->add<CURLOPT_TIMEOUT_MS>(static_cast<long>(timeout));
+        curlEasy_->add<CURLOPT_TIMEOUT_MS>(static_cast<long>(timeoutMs));
     }
 
     // URL
