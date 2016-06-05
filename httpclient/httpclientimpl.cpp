@@ -135,6 +135,12 @@ Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
                 0,
                 std::vector<Http::HttpHeader>());
 
+#ifdef _WIN32
+    // Disable ALPN which is not supported on Windows < 8.1
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/aa379340%28v=vs.85%29.aspx
+    curlEasy_->add<CURLOPT_SSL_ENABLE_ALPN>(0);
+#endif
+
     // CA bundle
     if (CaBundle::available())
     {
