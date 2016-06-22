@@ -33,11 +33,19 @@ find_package(libkullo REQUIRED
     NO_DEFAULT_PATH
 )
 
-find_package(curl REQUIRED
-    NO_MODULE
-    PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../build-curl"
-    NO_DEFAULT_PATH
-)
+if(WIN32 AND ((NOT CMAKE_BUILD_TYPE) OR (CMAKE_BUILD_TYPE STREQUAL "Debug")))
+    find_package(curl REQUIRED
+        NO_MODULE
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../build-curl-debug"
+        NO_DEFAULT_PATH
+    )
+else()
+    find_package(curl REQUIRED
+        NO_MODULE
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../build-curl"
+        NO_DEFAULT_PATH
+    )
+endif()
 
 if(UNIX AND NOT APPLE)
     find_package(openssl REQUIRED

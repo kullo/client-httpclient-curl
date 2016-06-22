@@ -65,7 +65,8 @@ static const boost::regex HEADER_REGEX(
         "\\A"          // start of string
             "([^:]*)"  // header name
             ":[ \t]*"  // colon and optional spaces or tabs
-            "(.*)"     // header value
+            "(.*?)"    // header value (non-greedy)
+            "[\\s]*"   // trow away trailing whitespace like line breaks
         "\\z"          // end of string
         );
 
