@@ -22,27 +22,32 @@ endif()
 
 project(httpclient-curl)
 
-set(_bin_libkullo "${CMAKE_CURRENT_SOURCE_DIR}/../bin-libkullo${install_prefix_suffix}")
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${_bin_libkullo}/cmake")
+set(_bin_botan "${CMAKE_CURRENT_BINARY_DIR}/../bin-botan${install_prefix_suffix}")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${_bin_botan}/cmake")
 include(CompilerSettings)
 include(KulloCommon)
 
+find_package(botan REQUIRED
+    NO_MODULE
+    PATHS "${_bin_botan}"
+    NO_DEFAULT_PATH
+)
 find_package(libkullo REQUIRED
     NO_MODULE
-    PATHS ${_bin_libkullo}
+    PATHS "${CMAKE_CURRENT_BINARY_DIR}/../bin-libkullo${install_prefix_suffix}"
     NO_DEFAULT_PATH
 )
 
 if(WIN32 AND ((NOT CMAKE_BUILD_TYPE) OR (CMAKE_BUILD_TYPE STREQUAL "Debug")))
     find_package(curl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../build-curl-debug"
+        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../build-curl-debug"
         NO_DEFAULT_PATH
     )
 else()
     find_package(curl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../build-curl"
+        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../build-curl"
         NO_DEFAULT_PATH
     )
 endif()
@@ -50,7 +55,7 @@ endif()
 if(UNIX AND NOT APPLE)
     find_package(openssl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../build-openssl"
+        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../build-openssl"
         NO_DEFAULT_PATH
     )
 endif()
