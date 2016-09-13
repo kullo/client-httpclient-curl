@@ -29,7 +29,9 @@ using curl::curl_pair;
 
 namespace HttpClient {
 
-static int xferInfoCallback(
+namespace {
+
+int xferInfoCallback(
         void *function,
         curl_off_t dltotal,
         curl_off_t dlnow,
@@ -45,8 +47,7 @@ static int xferInfoCallback(
     return result == Http::ProgressResult::Cancel ? 1 : 0;
 }
 
-static size_t readCallback(
-        char *buffer, size_t size, size_t nmemb, void *function)
+size_t readCallback(char *buffer, size_t size, size_t nmemb, void *function)
 {
     // get bound read function from RequestListener
     kulloAssert(function);
@@ -61,7 +62,7 @@ static size_t readCallback(
     return result.size();
 }
 
-static const boost::regex HEADER_REGEX(
+const boost::regex HEADER_REGEX(
         "\\A"          // start of string
             "([^:]*)"  // header name
             ":[ \t]*"  // colon and optional spaces or tabs
@@ -70,8 +71,7 @@ static const boost::regex HEADER_REGEX(
         "\\z"          // end of string
         );
 
-static size_t headerCallback(
-        char *buffer, size_t size, size_t nmemb, void *headers)
+size_t headerCallback(char *buffer, size_t size, size_t nmemb, void *headers)
 {
     // get headers vector from Result
     kulloAssert(headers);
@@ -90,8 +90,7 @@ static size_t headerCallback(
     return line.size();
 }
 
-static size_t writeCallback(
-        char *buffer, size_t size, size_t nmemb, void *function)
+size_t writeCallback(char *buffer, size_t size, size_t nmemb, void *function)
 {
     // get bound dataReceived function from ResponseListener
     kulloAssert(function);
@@ -106,12 +105,26 @@ static size_t writeCallback(
     return data.size();
 }
 
-static size_t noopWriteCallback(
-        char *buffer, size_t size, size_t nmemb, void *userdata)
+size_t noopWriteCallback(char *buffer, size_t size, size_t nmemb, void *userdata)
 {
     (void)buffer;
     (void)userdata;
     return size * nmemb;
+}
+
+std::string formattedTraceback(const curl_easy_exception &exception)
+{
+    std::ostringstream out;
+    bool first = true;
+    for (const auto &pair : exception.get_traceback())
+    {
+        if (!first) out << "\n";
+        first = false;
+        out << "'" << pair.first << "' in " << pair.second;
+    }
+    return out.str();
+}
+
 }
 
 HttpClientImpl::HttpClientImpl()
@@ -194,20 +207,14 @@ Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
 
         case CURLE_OPERATION_TIMEDOUT:
             result.error = Http::ResponseError::Timeout;
+            Log.e() << "HTTP exception: " << formattedTraceback(ex) << "\n"
+                    << "Details: " << curlErrorBuffer_;
             break;
 
         default:
             result.error = Http::ResponseError::NetworkError;
 
-            std::ostringstream traceback;
-            bool first = true;
-            for (const auto &pair : ex.get_traceback())
-            {
-                if (!first) traceback << "\n";
-                first = false;
-                traceback << "'" << pair.first << "' in " << pair.second;
-            }
-            Log.e() << "HTTP exception: " << traceback.str() << "\n"
+            Log.e() << "HTTP exception: " << formattedTraceback(ex) << "\n"
                     << "Details: " << curlErrorBuffer_;
         }
     }
