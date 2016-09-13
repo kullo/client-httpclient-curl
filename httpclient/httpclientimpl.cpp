@@ -162,10 +162,9 @@ Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
     }
 
     // timeout
-    kulloAssert(timeoutMs <= std::numeric_limits<long>::max());
     if (timeoutMs > 0)
     {
-        curlEasy_->add<CURLOPT_TIMEOUT_MS>(static_cast<long>(timeoutMs));
+        curlEasy_->add<CURLOPT_TIMEOUT_MS>(timeoutMs);
     }
 
     // URL
@@ -301,9 +300,6 @@ void HttpClientImpl::setMethod(
         curlEasy_->add<CURLOPT_HTTPGET>(1);
         curlEasy_->add<CURLOPT_CUSTOMREQUEST>("DELETE");
         break;
-
-    default:
-        kulloAssert(false);
     }
 }
 
