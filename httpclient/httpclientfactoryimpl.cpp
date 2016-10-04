@@ -15,11 +15,14 @@ std::shared_ptr<Kullo::Http::HttpClient> HttpClientFactoryImpl::createHttpClient
 std::unordered_map<std::string, std::string> HttpClientFactoryImpl::versions()
 {
     curl::curl_info curlInfo;
-    auto versionNum = curlInfo.get_version_number();
-    auto curlVersion =
-            std::to_string((versionNum >> 16) & 0xff) + "." +
-            std::to_string((versionNum >> 8) & 0xff) + "." +
-            std::to_string(versionNum & 0xff);
+
+    // FIXME: This is a temporary fix for broken version number of cURL 7.50.3
+    const auto curlVersion = "7.50.3";
+    // auto versionNum = curlInfo.get_version_number();
+    // auto curlVersion =
+    //         std::to_string((versionNum >> 16) & 0xff) + "." +
+    //         std::to_string((versionNum >> 8) & 0xff) + "." +
+    //         std::to_string(versionNum & 0xff);
 
     // If the SSL lib has a version number, it looks like that: OpenSSL/1.0.1m
     std::stringstream sslVersionStream{curlInfo.get_ssl_version()};
