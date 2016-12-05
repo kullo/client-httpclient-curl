@@ -5,6 +5,7 @@ add_executable(httpclient_tests
     test_cabundle.cpp
     test_httpclient.cpp
     test_httpclientfactory.cpp
+    test_utils.cpp
 )
 
 target_link_libraries(httpclient_tests

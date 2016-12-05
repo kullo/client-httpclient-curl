@@ -1,3 +1,4 @@
+/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
 #include <gmock/gmock.h>
 
 #include <kulloclient/protocol/debug.h>
@@ -32,7 +33,7 @@ protected:
 #if 0
 TEST_F(HttpClientImpl, successOnBadAuth)
 {
-    EXPECT_CALL(*respL, progress(_, _, _, _))
+    EXPECT_CALL(*respL, progress(_))
             .WillRepeatedly(Return(Http::ProgressResult::Continue));
     req->url = "http://httpbin.org/basic-auth/user/passwd";
     auto resp = uut.sendRequest(*req, 0, nullptr, respL);
@@ -43,7 +44,7 @@ TEST_F(HttpClientImpl, successOnBadAuth)
 
 TEST_F(HttpClientImpl, connectionFailure)
 {
-    EXPECT_CALL(*respL, progress(_, _, _, _))
+    EXPECT_CALL(*respL, progressed(_))
             .WillRepeatedly(Return(Http::ProgressResult::Continue));
 
     req->url = "http://localhost:1/";

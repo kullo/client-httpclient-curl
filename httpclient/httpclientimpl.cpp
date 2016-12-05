@@ -1,3 +1,4 @@
+/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
 #ifdef _MSC_VER
     // Stop MSVC from polluting the namespace with min and max macros. These
     // collide with std::numeric_limits<T>::max().
@@ -8,18 +9,21 @@
 
 #include <cstring>
 #include <limits>
+#include <regex>
 #include <sstream>
 
-#include <boost/regex.hpp>
 #include <kulloclient/http/Request.h>
 #include <kulloclient/http/RequestListener.h>
 #include <kulloclient/http/Response.h>
 #include <kulloclient/http/ResponseError.h>
 #include <kulloclient/http/ResponseListener.h>
+#include <kulloclient/http/TransferProgress.h>
 #include <kulloclient/util/assert.h>
 #include <kulloclient/util/librarylogger.h>
+#include <kulloclient/util/strings.h>
 
 #include "httpclient/cabundle.h"
+#include "httpclient/utils.h"
 
 using namespace Kullo;
 using curl::curl_easy;
@@ -43,7 +47,8 @@ int xferInfoCallback(
     auto progressFunction = static_cast<ProgressFunctionType*>(function);
 
     // returning non-zero cancels the request
-    auto result = (*progressFunction)(ulnow, ultotal, dlnow, dltotal);
+    Http::TransferProgress progress = {ulnow, ultotal, dlnow, dltotal};
+    auto result = (*progressFunction)(progress);
     return result == Http::ProgressResult::Cancel ? 1 : 0;
 }
 
@@ -62,15 +67,6 @@ size_t readCallback(char *buffer, size_t size, size_t nmemb, void *function)
     return result.size();
 }
 
-const boost::regex HEADER_REGEX(
-        "\\A"          // start of string
-            "([^:]*)"  // header name
-            ":[ \t]*"  // colon and optional spaces or tabs
-            "(.*?)"    // header value (non-greedy)
-            "[\\s]*"   // trow away trailing whitespace like line breaks
-        "\\z"          // end of string
-        );
-
 size_t headerCallback(char *buffer, size_t size, size_t nmemb, void *headers)
 {
     // get headers vector from Result
@@ -80,13 +76,12 @@ size_t headerCallback(char *buffer, size_t size, size_t nmemb, void *headers)
     // get header line from curl
     std::string line(buffer, size * nmemb);
 
-    // split and append to headersVec
-    boost::smatch matches;
-    if (boost::regex_match(line, matches, HEADER_REGEX))
+    const auto keyValuePair = Utils::parseHeader(line);
+    if (keyValuePair)
     {
-        kulloAssert(matches.size() == 3); // full match + 2 groups
-        headersVec->emplace_back(matches[1].str(), matches[2].str());
+        headersVec->emplace_back(keyValuePair->first, keyValuePair->second);
     }
+
     return line.size();
 }
 
@@ -231,6 +226,10 @@ void HttpClientImpl::addHeaders(const std::vector<Http::HttpHeader> &headers)
         for (const auto &hdr : headers)
         {
             requestState_->reqHeaders->add(hdr.key + ": " + hdr.value);
+            if (Util::Strings::toLower(hdr.key) == "content-length")
+            {
+                curlEasy_->add<CURLOPT_INFILESIZE>(std::stol(hdr.value));
+            }
         }
         curlEasy_->add(curl_pair<CURLoption, curl_header>(
                            CURLOPT_HTTPHEADER, *requestState_->reqHeaders));
@@ -241,12 +240,12 @@ void HttpClientImpl::addCancelCallback(Http::ResponseListener *respL)
 {
     kulloAssert(respL);
 
-    using namespace std::placeholders;
     requestState_->progressFunction.reset(
                 new ProgressFunctionType(
                     std::bind(
-                        &Http::ResponseListener::progress,
-                        respL, _1, _2, _3, _4
+                        &Http::ResponseListener::progressed,
+                        respL,
+                        std::placeholders::_1
                         )));
 
     curlEasy_->add<CURLOPT_NOPROGRESS>(0);

@@ -1,3 +1,4 @@
+/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
 #pragma once
 
 #include <functional>
@@ -12,12 +13,13 @@
 #include <kulloclient/http/HttpHeader.h>
 #include <kulloclient/http/HttpMethod.h>
 #include <kulloclient/http/ProgressResult.h>
+#include <kulloclient/http/TransferProgress.h>
 
 namespace HttpClient {
 
-// represents ResponseListener::progress
+// represents ResponseListener::progressed
 using ProgressFunctionType = std::function<
-    Kullo::Http::ProgressResult(int64_t, int64_t, int64_t, int64_t)
+    Kullo::Http::ProgressResult(const Kullo::Http::TransferProgress &)
 >;
 
 // represents RequestListener::read

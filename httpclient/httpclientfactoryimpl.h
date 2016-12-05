@@ -1,3 +1,4 @@
+/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
 #pragma once
 
 #include <kulloclient/http/HttpClientFactory.h>

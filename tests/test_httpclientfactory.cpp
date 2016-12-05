@@ -1,3 +1,4 @@
+/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
 #include <iostream>
 #include <gmock/gmock.h>
 
@@ -10,4 +11,3 @@ TEST(HttpClientFactory, versionsWorks)
     auto versions = HttpClient::HttpClientFactoryImpl().versions();
     EXPECT_THAT(versions, Contains(Key("cURL")));
 }
-
