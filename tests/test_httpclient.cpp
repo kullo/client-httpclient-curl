@@ -1,4 +1,4 @@
-/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
+/* Copyright 2015–2017 Kullo GmbH. All rights reserved. */
 #include <gmock/gmock.h>
 
 #include <kulloclient/protocol/debug.h>

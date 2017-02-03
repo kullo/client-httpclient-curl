@@ -1,4 +1,4 @@
-/* Copyright 2015–2016 Kullo GmbH. All rights reserved. */
+/* Copyright 2015–2017 Kullo GmbH. All rights reserved. */
 #ifdef _MSC_VER
     // Stop MSVC from polluting the namespace with min and max macros. These
     // collide with std::numeric_limits<T>::max().
