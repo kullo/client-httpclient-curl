@@ -144,6 +144,10 @@ Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
                 0,
                 std::vector<Http::HttpHeader>());
 
+    // Disable OCSP checking to prevents Kullo from going down when the CA's
+    // infrastructure does
+    curlEasy_->add<CURLOPT_SSL_OPTIONS>(CURLSSLOPT_NO_REVOKE);
+
 #ifdef _WIN32
     // Disable ALPN which is not supported on Windows < 8.1
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa379340%28v=vs.85%29.aspx
