@@ -122,8 +122,9 @@ std::string formattedTraceback(const curl_easy_exception &exception)
 
 }
 
-HttpClientImpl::HttpClientImpl()
-    : curlEasy_(new curl_easy),
+HttpClientImpl::HttpClientImpl(const boost::optional<std::string> &acceptLanguage)
+    : acceptLanguage_(acceptLanguage),
+      curlEasy_(new curl_easy),
       requestState_(new RequestState)
 {
 }
@@ -224,20 +225,27 @@ Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
 
 void HttpClientImpl::addHeaders(const std::vector<Http::HttpHeader> &headers)
 {
-    if (!headers.empty())
+    bool acceptLanguageSet = false;
+    requestState_->reqHeaders.reset(new curl_header());
+    for (const auto &hdr : headers)
     {
-        requestState_->reqHeaders.reset(new curl_header());
-        for (const auto &hdr : headers)
+        requestState_->reqHeaders->add(hdr.key + ": " + hdr.value);
+        auto lcaseKey = Util::Strings::toLower(hdr.key);
+        if (lcaseKey == "content-length")
         {
-            requestState_->reqHeaders->add(hdr.key + ": " + hdr.value);
-            if (Util::Strings::toLower(hdr.key) == "content-length")
-            {
-                curlEasy_->add<CURLOPT_INFILESIZE>(std::stol(hdr.value));
-            }
+            curlEasy_->add<CURLOPT_INFILESIZE>(std::stol(hdr.value));
         }
-        curlEasy_->add(curl_pair<CURLoption, curl_header>(
-                           CURLOPT_HTTPHEADER, *requestState_->reqHeaders));
+        else if (lcaseKey == "accept-language")
+        {
+            acceptLanguageSet = true;
+        }
     }
+    if (!acceptLanguageSet && acceptLanguage_)
+    {
+        requestState_->reqHeaders->add("Accept-Language: " + *acceptLanguage_);
+    }
+    curlEasy_->add(curl_pair<CURLoption, curl_header>(
+                       CURLOPT_HTTPHEADER, *requestState_->reqHeaders));
 }
 
 void HttpClientImpl::addCancelCallback(Http::ResponseListener *respL)

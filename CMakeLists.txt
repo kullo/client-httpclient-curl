@@ -2,14 +2,8 @@ cmake_minimum_required(VERSION 2.8.12)  # version provided by Ubuntu 14.04
 
 # These must come before the project directive, won't work otherwise
 
-if((NOT CMAKE_BUILD_TYPE) OR (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-    set(install_prefix_suffix "-debug")
-else()
-    set(install_prefix_suffix "")
-endif()
 set(
-    CMAKE_INSTALL_PREFIX
-        "${CMAKE_CURRENT_BINARY_DIR}/../bin-httpclient-curl${install_prefix_suffix}"
+    CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/../bin-httpclient-curl"
     CACHE PATH "destination for make install"
 )
 
@@ -26,28 +20,27 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_LIST_DIR}/../compi
 include(CompilerSettings)
 include(KulloCommon)
 
-set(_bin_botan "${CMAKE_CURRENT_BINARY_DIR}/../bin-botan${install_prefix_suffix}")
 find_package(botan REQUIRED
     NO_MODULE
-    PATHS "${_bin_botan}"
+    PATHS "${CMAKE_CURRENT_BINARY_DIR}/../bin-botan"
     NO_DEFAULT_PATH
 )
 find_package(libkullo REQUIRED
     NO_MODULE
-    PATHS "${CMAKE_CURRENT_BINARY_DIR}/../bin-libkullo${install_prefix_suffix}"
+    PATHS "${CMAKE_CURRENT_BINARY_DIR}/../bin-libkullo"
     NO_DEFAULT_PATH
 )
 
 if(WIN32 AND ((NOT CMAKE_BUILD_TYPE) OR (CMAKE_BUILD_TYPE STREQUAL "Debug")))
     find_package(curl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../build-curl-debug"
+        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../../build-curl-debug"
         NO_DEFAULT_PATH
     )
 else()
     find_package(curl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../build-curl"
+        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../../build-curl"
         NO_DEFAULT_PATH
     )
 endif()
@@ -55,7 +48,7 @@ endif()
 if(UNIX AND NOT APPLE)
     find_package(openssl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../build-openssl"
+        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../../build-openssl"
         NO_DEFAULT_PATH
     )
 endif()

@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include <boost/optional.hpp>
 #include <curl/curl.h>
 #include <curl_easy.h>
 #include <curl_header.h>
@@ -32,7 +33,7 @@ using WriteFunctionType = std::function<void(std::vector<uint8_t>)>;
 class HttpClientImpl : public Kullo::Http::HttpClient
 {
 public:
-    HttpClientImpl();
+    explicit HttpClientImpl(const boost::optional<std::string> &acceptLanguage);
     virtual ~HttpClientImpl() override;
 
     virtual Kullo::Http::Response sendRequest(const Kullo::Http::Request &request,
@@ -64,6 +65,8 @@ private:
             std::vector<Kullo::Http::HttpHeader> &headers);
 
     void addResponseBodyCallback(Kullo::Http::ResponseListener *respL);
+
+    boost::optional<std::string> acceptLanguage_;
 
     // must live longer than curlEasy_, so declare it before curlEasy_
     char curlErrorBuffer_[CURL_ERROR_SIZE];

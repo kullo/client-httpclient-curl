@@ -14,7 +14,8 @@ class HttpClientImpl : public Test
 {
 protected:
     HttpClientImpl()
-        : req(new Http::Request(
+        : uut(std::string("de_DE"))
+        , req(new Http::Request(
                   Http::HttpMethod::Get,
                   "http://httpbin.org/get",
                   std::vector<Http::HttpHeader>()
@@ -33,7 +34,7 @@ protected:
 #if 0
 TEST_F(HttpClientImpl, successOnBadAuth)
 {
-    EXPECT_CALL(*respL, progress(_))
+    EXPECT_CALL(*respL, progressed(_))
             .WillRepeatedly(Return(Http::ProgressResult::Continue));
     req->url = "http://httpbin.org/basic-auth/user/passwd";
     auto resp = uut.sendRequest(*req, 0, nullptr, respL);

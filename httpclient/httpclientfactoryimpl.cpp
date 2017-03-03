@@ -8,9 +8,15 @@
 
 namespace HttpClient {
 
+void HttpClientFactoryImpl::setAcceptLanguage(
+        const boost::optional<std::string> &acceptLanguage)
+{
+    this->acceptLanguage_ = acceptLanguage;
+}
+
 std::shared_ptr<Kullo::Http::HttpClient> HttpClientFactoryImpl::createHttpClient()
 {
-    return std::make_shared<HttpClientImpl>();
+    return std::make_shared<HttpClientImpl>(acceptLanguage_);
 }
 
 std::unordered_map<std::string, std::string> HttpClientFactoryImpl::versions()
