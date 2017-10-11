@@ -11,7 +11,7 @@ class HttpClientFactoryImpl : public Kullo::Http::HttpClientFactory
 public:
     void setAcceptLanguage(const boost::optional<std::string> &acceptLanguage_);
 
-    virtual std::shared_ptr<Kullo::Http::HttpClient> createHttpClient() override;
+    virtual Kullo::nn_shared_ptr<Kullo::Http::HttpClient> createHttpClient() override;
     virtual std::unordered_map<std::string, std::string> versions() override;
 
 private:

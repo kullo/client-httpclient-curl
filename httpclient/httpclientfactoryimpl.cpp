@@ -14,9 +14,9 @@ void HttpClientFactoryImpl::setAcceptLanguage(
     this->acceptLanguage_ = acceptLanguage;
 }
 
-std::shared_ptr<Kullo::Http::HttpClient> HttpClientFactoryImpl::createHttpClient()
+Kullo::nn_shared_ptr<Kullo::Http::HttpClient> HttpClientFactoryImpl::createHttpClient()
 {
-    return std::make_shared<HttpClientImpl>(acceptLanguage_);
+    return Kullo::nn_make_shared<HttpClientImpl>(acceptLanguage_);
 }
 
 std::unordered_map<std::string, std::string> HttpClientFactoryImpl::versions()
