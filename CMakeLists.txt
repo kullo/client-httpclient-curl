@@ -37,9 +37,15 @@ find_package(curlwrapper REQUIRED
 )
 
 if(UNIX AND NOT APPLE)
+    if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        set(OPENSSL_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../build-linux-x86_64-debug/build-openssl")
+    else()
+        set(OPENSSL_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../build-linux-x86_64-release/build-openssl")
+    endif()
+
     find_package(openssl REQUIRED
         NO_MODULE
-        PATHS "${CMAKE_CURRENT_BINARY_DIR}/../../build-openssl"
+        PATHS "${OPENSSL_BUILD_PATH}"
         NO_DEFAULT_PATH
     )
 endif()

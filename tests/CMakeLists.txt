@@ -17,7 +17,7 @@ target_link_libraries(httpclient_tests
 ## configure_file updates the file when it has changed, even when httpclient hasn't changed
 #foreach(_filename libcrypto.so.1.0.0 libssl.so.1.0.0)
 #    configure_file(
-#        ../../build-openssl/lib/${_filename}
+#        FIX_BUILD_PATH/build-openssl/lib/${_filename}
 #        ${CMAKE_CURRENT_BINARY_DIR}
 #        COPYONLY
 #    )
