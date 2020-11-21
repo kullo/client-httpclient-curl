@@ -152,7 +152,13 @@ Http::Response HttpClientImpl::sendRequest(const Http::Request &request,
 #ifdef _WIN32
     // Disable ALPN which is not supported on Windows < 8.1
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa379340%28v=vs.85%29.aspx
-    curlEasy_->add<CURLOPT_SSL_ENABLE_ALPN>(0);
+    try {
+        curlEasy_->add<CURLOPT_SSL_ENABLE_ALPN>(0);
+    } catch (...) {
+        // Since https://github.com/curl/curl/commit/e91e48161235272ff485ff32bd048c53af731f43,
+        // if HTTP2 is disabled the above call throws because curlcpp converts
+        // CURLE_UNKNOWN_OPTION to an exception.
+    }
 #endif
 
     // CA bundle
